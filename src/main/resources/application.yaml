@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: eventiq-monitoring
+  datasource:
+    url: jdbc:postgresql://localhost:5432/eventiq-identity
+    username: postgres
+    password: postgres
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 30000
+      max-lifetime: 1800000
+      connection-timeout: 20000
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration
+  config:
+    import: "consul:localhost:8500"
+  cloud:
+    consul:
+      host: localhost
+      port: 8500
+      discovery:
+        hostname: localhost
+        prefer-ip-address: false
+        health-check-path: /actuator/health
+        health-check-interval: 10s
+        instance-id: ${spring.application.name}-${server.port}
+      config:
+        enabled: true
+        format: yaml
+        data-key: data
+server:
+  port: 9054
