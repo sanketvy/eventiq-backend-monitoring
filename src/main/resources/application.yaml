@@ -1,6 +1,15 @@
 spring:
   application:
     name: eventiq-monitoring
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8001/realms/eventiq
+  data:
+    redis:
+      host: localhost
+      port: 6379
   datasource:
     url: jdbc:postgresql://localhost:5432/eventiq-identity
     username: postgres
@@ -11,6 +20,10 @@ spring:
       idle-timeout: 30000
       max-lifetime: 1800000
       connection-timeout: 20000
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
   autoconfigure:
     exclude: org.springframework.boot.autoconfigure.cassandra.CassandraAutoConfiguration
   config:
