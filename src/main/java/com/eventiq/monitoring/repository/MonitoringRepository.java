@@ -11,4 +11,6 @@ public interface MonitoringRepository extends JpaRepository<Monitoring, Long> {
     List<Monitoring> findAllByUserId(String userId);
 
     List<Monitoring> findAllByUserIdAndProjectId(String userId, String projectId);
+
+    List<Monitoring> findAllByInterval(Integer interval);
 }

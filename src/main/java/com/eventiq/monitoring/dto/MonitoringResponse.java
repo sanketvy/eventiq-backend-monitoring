@@ -22,4 +22,6 @@ public class MonitoringResponse {
     private String status;
 
     private Integer responseTime;
+
+    private Integer lastChecked;
 }

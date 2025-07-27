@@ -10,9 +10,13 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -54,8 +58,18 @@ public class MonitoringService {
                 monitoringResponse.setCheckInterval(monitoring.getInterval());
                 monitoringResponse.setEnabled(monitoring.getEnabled());
                 monitoringResponse.setUrl(monitoring.getUrl());
-                monitoringResponse.setResponseTime((Integer) Optional.ofNullable(redisTemplate.opsForHash().get(monitoring.getProjectId() + Constants.MONITORING, Constants.LATENCY)).orElse(0));
-                monitoringResponse.setStatus((String) Optional.ofNullable(redisTemplate.opsForHash().get(monitoring.getProjectId() + Constants.MONITORING, Constants.STATUS)).orElse("UNKNOWN"));
+                monitoringResponse.setResponseTime((Integer) Optional.ofNullable(redisTemplate.opsForHash().get(monitoring.getProjectId() + monitoring.getId() + Constants.MONITORING, Constants.LATENCY)).orElse(0));
+                monitoringResponse.setStatus((String) Optional.ofNullable(redisTemplate.opsForHash().get(monitoring.getProjectId() + monitoring.getId() + Constants.MONITORING, Constants.STATUS)).orElse("UNKNOWN"));
+
+                String lastCheckedStr = (String) redisTemplate.opsForHash().get(
+                        monitoring.getProjectId() + monitoring.getId() + Constants.MONITORING,
+                        Constants.LAST_CHECKED
+                );
+                if (lastCheckedStr != null) {
+                    LocalDateTime lastChecked = LocalDateTime.parse(lastCheckedStr); // Ensure the format matches
+                    Duration duration = Duration.between(lastChecked, LocalDateTime.now());
+                    monitoringResponse.setLastChecked((int) duration.getSeconds());
+                }
                 response.add(monitoringResponse);
             });
         }
